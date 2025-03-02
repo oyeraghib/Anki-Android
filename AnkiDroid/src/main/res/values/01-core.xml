@@ -115,6 +115,7 @@
 
     <string name="sd_card_not_mounted">Device storage not mounted</string>
     <string name="button_sync" comment="Text of the sync button" maxLength="28">Sync</string>
+    <string name="button_switch_profiles" comment="Text of the switch profiles button" maxLength="28">Switch Profiles</string>
     <string name="cancel_sync_confirm" tools:ignore="UnusedResources">Do you want to cancel the sync?</string>
     <string name="continue_sync" tools:ignore="UnusedResources">Continue sync</string>
     <string name="sync_cancelled" tools:ignore="UnusedResources">Sync cancelled</string>
