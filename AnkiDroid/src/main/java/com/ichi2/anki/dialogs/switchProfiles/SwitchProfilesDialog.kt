@@ -16,6 +16,7 @@
 
 package com.ichi2.anki.dialogs.switchProfiles
 
+import ProfileAdapter
 import android.os.Bundle
 import android.view.Gravity
 import android.view.View
@@ -67,7 +68,7 @@ class SwitchProfilesDialog : DialogFragment() {
                 )
 
                 showThemedToast(requireContext(), "Profile selected: $selectedProfile", true)
-            }, requireContext())
+            })
 
         // Handle button clicks (TODO: Implement actual functionality)
         btnOpen.setOnClickListener { dismiss() } // Open selected profile

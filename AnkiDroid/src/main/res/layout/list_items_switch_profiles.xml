@@ -15,9 +15,8 @@
         android:textColor="?attr/colorPrimary"
         android:paddingStart="8dp"
         android:background="?attr/selectableItemBackground"
-        android:clickable="true"
-        android:focusable="true"
-        tools:text="User Profile 1" />
+        tools:text="User Profile 1"
+        android:paddingVertical="12dp"/>
 
     <View
         android:layout_width="match_parent"
