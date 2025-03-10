@@ -27,6 +27,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.ichi2.anki.R
+import com.ichi2.anki.showThemedToast
 import com.ichi2.utils.create
 import com.ichi2.utils.negativeButton
 import timber.log.Timber
@@ -56,7 +57,7 @@ class SwitchProfilesDialog : DialogFragment() {
 
         Timber.d("Setting adapter with profiles: $profileList")
         recyclerView.adapter =
-            ProfileAdapter(profileList) { selectedProfile ->
+            ProfileAdapter(profileList, { selectedProfile ->
                 Timber.d("Profile selected: $selectedProfile")
 
                 // Send the selected profile to the parent fragment
@@ -65,8 +66,8 @@ class SwitchProfilesDialog : DialogFragment() {
                     bundleOf(KEY_SELECTED_PROFILE to selectedProfile),
                 )
 
-                dismiss() // Close the dialog after selection
-            }
+                showThemedToast(requireContext(), "Profile selected: $selectedProfile", true)
+            }, requireContext())
 
         // Handle button clicks (TODO: Implement actual functionality)
         btnOpen.setOnClickListener { dismiss() } // Open selected profile

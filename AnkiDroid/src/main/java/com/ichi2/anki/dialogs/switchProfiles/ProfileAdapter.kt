@@ -16,18 +16,22 @@
 
 package com.ichi2.anki.dialogs.switchProfiles
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.ichi2.anki.R
-import timber.log.Timber
 
 class ProfileAdapter(
     private val profiles: List<String>,
     private val onClick: (String) -> Unit,
+    private val context: Context,
 ) : RecyclerView.Adapter<ProfileAdapter.ProfileViewHolder>() {
+    private var selectedPosition = 0 // Default: First profile selected
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -41,7 +45,17 @@ class ProfileAdapter(
         position: Int,
     ) {
         val profileName = profiles[position]
-        holder.bind(profileName, onClick)
+        holder.bind(profileName, onClick, context, position == selectedPosition)
+
+        // Update selection state
+        holder.itemView.setOnClickListener {
+            val previousSelected = selectedPosition
+            selectedPosition = position
+            notifyItemChanged(previousSelected) // Refresh old selection
+            notifyItemChanged(selectedPosition) // Refresh new selection
+
+            onClick(profileName)
+        }
     }
 
     override fun getItemCount(): Int = profiles.size
@@ -54,10 +68,17 @@ class ProfileAdapter(
         fun bind(
             profileName: String,
             onClick: (String) -> Unit,
+            context: Context,
+            isSelected: Boolean,
         ) {
             profileText.text = profileName
-            Timber.d("text: $profileName")
-            itemView.setOnClickListener { onClick(profileName) }
+            // Highlight selected profile
+            itemView.setBackgroundColor(
+                ContextCompat.getColor(context, if (isSelected) R.color.material_blue_grey_100 else R.color.white),
+            )
+            itemView.setOnClickListener {
+                onClick(profileName)
+            }
         }
     }
 }
