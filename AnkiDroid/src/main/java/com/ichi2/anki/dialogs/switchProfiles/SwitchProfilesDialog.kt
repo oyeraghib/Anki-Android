@@ -17,7 +17,10 @@
 package com.ichi2.anki.dialogs.switchProfiles
 
 import android.os.Bundle
+import android.view.Gravity
+import android.view.View
 import android.widget.Button
+import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
@@ -26,7 +29,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ichi2.anki.R
 import com.ichi2.utils.create
 import com.ichi2.utils.negativeButton
-import com.ichi2.utils.title
 import timber.log.Timber
 
 class SwitchProfilesDialog : DialogFragment() {
@@ -72,8 +74,17 @@ class SwitchProfilesDialog : DialogFragment() {
         btnRename.setOnClickListener { dismiss() } // Rename selected profile
         btnDelete.setOnClickListener { dismiss() } // Delete selected profile
 
+        val titleView =
+            TextView(context).apply {
+                text = "Switch Profile"
+                textSize = 20f
+                textAlignment = View.TEXT_ALIGNMENT_CENTER
+                gravity = Gravity.CENTER
+                setPadding(20, 40, 20, 20) // Adjust padding as needed
+            }
+
         return AlertDialog.Builder(requireContext()).create {
-            title(R.string.switch_profile)
+            setCustomTitle(titleView)
             negativeButton(R.string.dialog_cancel)
             setView(view) // Attach custom layout
         }
