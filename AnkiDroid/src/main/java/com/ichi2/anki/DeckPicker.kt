@@ -137,6 +137,7 @@ import com.ichi2.anki.dialogs.SyncErrorDialog.Companion.newInstance
 import com.ichi2.anki.dialogs.SyncErrorDialog.SyncErrorDialogListener
 import com.ichi2.anki.dialogs.customstudy.CustomStudyDialog
 import com.ichi2.anki.dialogs.customstudy.CustomStudyDialog.CustomStudyAction
+import com.ichi2.anki.dialogs.switchProfiles.SwitchProfilesDialog
 import com.ichi2.anki.export.ActivityExportingDelegate
 import com.ichi2.anki.export.ExportDialogFragment
 import com.ichi2.anki.export.ExportDialogsFactory
@@ -1169,6 +1170,14 @@ open class DeckPicker :
                 }
                 return true
             }
+            R.id.action_switch_profiles -> {
+                Timber.i("DeckPicker:: Switch Profiles button pressed")
+                // Show ProfileSwitchDialogFragment
+                val dialog = SwitchProfilesDialog.newInstance(getProfileList())
+                dialog.show(supportFragmentManager, "SwitchProfilesDialog")
+
+                return true
+            }
             R.id.action_import -> {
                 Timber.i("DeckPicker:: Import button pressed")
                 showImportDialog()
@@ -1224,6 +1233,10 @@ open class DeckPicker :
             }
             else -> return super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun getProfileList(): List<String> {
+        return listOf("Default", "Work", "Study") // Replace with real profiles
     }
 
     fun showCreateFilteredDeckDialog() {

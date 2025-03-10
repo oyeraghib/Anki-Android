@@ -19,6 +19,7 @@
         android:id="@+id/action_switch_profiles"
         android:icon="@drawable/ic_switch_profiles"
         android:title="@string/button_switch_profiles"
+        ankidroid:actionProviderClass="com.ichi2.anki.dialogs.switchProfiles.SwitchProfilesDialog"
         ankidroid:showAsAction="always"/>
     <item
         android:id="@+id/action_undo"
