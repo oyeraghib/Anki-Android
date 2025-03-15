@@ -81,7 +81,7 @@ object CollectionHelper {
     @Throws(StorageAccessException::class)
     fun initializeAnkiDroidDirectory(path: String) {
         // Create specified directory if it doesn't exit
-        val dir = File(path)
+        val dir = File(path, "profiles/default") // Initialises a default profile
         if (!dir.exists() && !dir.mkdirs()) {
             throw StorageAccessException("Failed to create AnkiDroid directory $path")
         }
@@ -96,6 +96,19 @@ object CollectionHelper {
             } catch (e: IOException) {
                 throw StorageAccessException("Failed to create .nomedia file", e)
             }
+        }
+    }
+
+    /**
+     * Creates a new profile directory everytime a user adds a profile from Switch Profiles
+     */
+    fun createProfileDirectory(
+        path: String,
+        profileName: String,
+    ) {
+        val profileDir = File(path, "profiles/$profileName")
+        if (!profileDir.exists() && !profileDir.mkdirs()) {
+            throw StorageAccessException("Failed to create profile $profileName")
         }
     }
 
