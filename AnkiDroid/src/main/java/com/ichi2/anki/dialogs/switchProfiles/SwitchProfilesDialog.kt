@@ -27,6 +27,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.ichi2.anki.CollectionHelper
 import com.ichi2.anki.R
 import com.ichi2.anki.showThemedToast
 import com.ichi2.utils.create
@@ -72,7 +73,11 @@ class SwitchProfilesDialog : DialogFragment() {
 
         // Handle button clicks (TODO: Implement actual functionality)
         btnOpen.setOnClickListener { dismiss() } // Open selected profile
-        btnAdd.setOnClickListener { dismiss() } // Add new profile
+        btnAdd.setOnClickListener {
+            val path = CollectionHelper.getCurrentAnkiDroidDirectory(requireContext())
+            val profileName = "oyeraghib" // TODO: take string from a dialog
+            CollectionHelper.createProfileDirectory(path, profileName)
+        } // Add new profile
         btnRename.setOnClickListener { dismiss() } // Rename selected profile
         btnDelete.setOnClickListener { dismiss() } // Delete selected profile
 
