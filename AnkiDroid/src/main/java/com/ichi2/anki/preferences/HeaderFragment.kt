@@ -29,6 +29,7 @@ import com.ichi2.anki.BuildConfig
 import com.ichi2.anki.CollectionManager
 import com.ichi2.anki.CollectionManager.TR
 import com.ichi2.anki.R
+import com.ichi2.anki.preferences.switchProfiles.SwitchProfilesSettingsFragment
 import com.ichi2.anki.settings.Prefs
 import com.ichi2.anki.ui.internationalization.toSentenceCase
 import com.ichi2.anki.utils.isWindowCompact
@@ -188,6 +189,7 @@ class HeaderFragment :
                 is AdvancedSettingsFragment -> R.string.pref_advanced_screen_key
                 is DevOptionsFragment, is ReviewerOptionsFragment -> R.string.pref_dev_options_screen_key
                 is AboutFragment -> R.string.about_screen_key
+                is SwitchProfilesSettingsFragment -> R.string.pref_switch_profiles_screen_key
                 else -> null
             }
     }
