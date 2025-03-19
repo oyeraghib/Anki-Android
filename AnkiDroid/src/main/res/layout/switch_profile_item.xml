@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:paddingVertical="8dp">
+
+    <!-- Profile Avatar -->
+    <TextView
+        android:id="@+id/profile_avatar"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:gravity="center"
+        android:textSize="16sp"
+        android:textColor="@android:color/white"
+        android:background="@drawable/bg_circle"
+        android:textStyle="bold"/>
+
+    <!-- Profile Name -->
+    <TextView
+        android:id="@+id/profile_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:paddingStart="12dp"
+        android:textSize="16sp"
+        tools:text="oyeraghib"
+        android:textColor="?android:attr/textColorPrimary"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <!-- Rename -->
+        <FrameLayout
+            android:id="@+id/rename_profile"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:foreground="?attr/selectableItemBackground"
+            android:gravity="center">
+
+            <ImageView
+                android:layout_gravity="center"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_mode_edit_white"
+                android:contentDescription="@string/rename_profile"/>
+        </FrameLayout>
+
+        <!-- Delete -->
+        <FrameLayout
+            android:id="@+id/delete_profile"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:foreground="?attr/selectableItemBackground"
+            android:gravity="center"
+            >
+
+            <ImageView
+                android:layout_gravity="center"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_delete"
+                android:contentDescription="@string/delete_profile"/>
+        </FrameLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

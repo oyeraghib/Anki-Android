@@ -209,4 +209,8 @@
     <string name="reviewer_menu_settings_key">reviewerMenuSettings</string>
     <string name="reviewer_frame_style_key">reviewerFrameStyle</string>
 
+    <!-- Switch Profiles -->
+    <string name="pref_switch_profiles_screen_key">switchProfilesScreen</string>
+    <string name="pref_switch_profiles_list">switch_profiles_list</string>
+
 </resources>
