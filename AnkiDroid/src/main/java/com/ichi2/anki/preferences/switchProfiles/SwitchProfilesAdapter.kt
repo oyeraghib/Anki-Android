@@ -30,6 +30,8 @@ class SwitchProfilesAdapter(
     private val profiles: List<Profile>,
     private val onActionClick: (Profile) -> Unit,
 ) : RecyclerView.Adapter<SwitchProfilesAdapter.ProfileViewHolder>() {
+    private var selectedPos = 0
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int,
@@ -44,6 +46,15 @@ class SwitchProfilesAdapter(
     ) {
         val profile = profiles[position]
         holder.bind(profile = profile, context = context, onActionClick = onActionClick)
+
+        // update selection state
+        holder.itemView.isSelected = (position == selectedPos)
+
+        holder.itemView.setOnClickListener {
+            selectedPos = position
+            notifyDataSetChanged() // TODO: Use list adapter
+            showThemedToast(context, "Profile ${profile.name} selected", true)
+        }
     }
 
     override fun getItemCount() = profiles.size
