@@ -15,9 +15,18 @@
  ****************************************************************************************/
 package com.ichi2.anki.preferences.switchProfiles
 
+import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import androidx.core.view.MenuProvider
+import androidx.lifecycle.Lifecycle
 import com.ichi2.anki.R
 import com.ichi2.anki.preferences.SettingsFragment
 import com.ichi2.anki.preferences.requirePreference
+import com.ichi2.anki.showThemedToast
+import timber.log.Timber
 
 class SwitchProfilesSettingsFragment : SettingsFragment() {
     override val preferenceResource: Int
@@ -30,4 +39,42 @@ class SwitchProfilesSettingsFragment : SettingsFragment() {
         requirePreference<ProfileListPreference>(getString(R.string.pref_switch_profiles_screen_key)).apply {
         }
     }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        Timber.d("inside onCreate")
+    }
+
+    override fun onViewCreated(
+        view: View,
+        savedInstanceState: Bundle?,
+    ) {
+        super.onViewCreated(view, savedInstanceState)
+        Timber.d("inside onViewCreated")
+
+        requireActivity().addMenuProvider(menuProvider, viewLifecycleOwner, Lifecycle.State.RESUMED)
+        Timber.d("Fragment attached to: ${requireActivity()::class.java.simpleName}")
+    }
+
+    private val menuProvider =
+        object : MenuProvider {
+            override fun onCreateMenu(
+                menu: Menu,
+                menuInflater: MenuInflater,
+            ) {
+                menuInflater.inflate(R.menu.switch_profiles_menu, menu)
+                Timber.d("Menu created")
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                Timber.d("Menu item selected: ${menuItem.title}")
+                return when (menuItem.itemId) {
+                    R.id.action_add_profile -> {
+                        showThemedToast(requireContext(), "Add Profile", true)
+                        true
+                    }
+                    else -> false
+                }
+            }
+        }
 }
