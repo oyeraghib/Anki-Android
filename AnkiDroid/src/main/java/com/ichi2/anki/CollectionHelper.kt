@@ -29,6 +29,7 @@ import com.ichi2.anki.preferences.sharedPrefs
 import com.ichi2.libanki.Collection
 import com.ichi2.libanki.DB
 import com.ichi2.preferences.getOrSetString
+import org.json.JSONObject
 import timber.log.Timber
 import java.io.File
 import java.io.FileNotFoundException
@@ -98,19 +99,63 @@ object CollectionHelper {
                 throw StorageAccessException("Failed to create .nomedia file", e)
             }
         }
+        insertDefaultProfileConfig(path)
+    }
+
+    fun insertDefaultProfileConfig(basePath: String) {
+        val profileConfigFile = File(basePath, ".ankidroidprofile")
+
+        // Check if the file already exists
+        if (!profileConfigFile.exists()) {
+            val profileConfig =
+                JSONObject().apply {
+                    put("display_name", "User 1")
+                    put("preferences", "default") // Default settings
+                }
+
+            try {
+                profileConfigFile.writeText(profileConfig.toString(4))
+                Timber.d("Created .ankidroidprofile config for default user in $basePath")
+            } catch (e: Exception) {
+                Timber.e("exception : ${e.message}")
+            }
+        } else {
+            Timber.d("ankidroidprofile config already exists for default user")
+        }
     }
 
     /**
      * Creates a new profile directory everytime a user adds a profile from Switch Profiles
+     * and initializes a .ankidroidprofile config for it
      */
     fun createProfileDirectory(
         path: String,
         profileName: String,
     ) {
-        val profileDir = File(path, profileName)
+        val profileDir = File(path, "user2") // TODO: use helper method to get this value
         Timber.d("profileDir: $profileDir")
+
         if (!profileDir.exists() && !profileDir.mkdirs()) {
             throw StorageAccessException("Failed to create profile $profileName")
+        }
+
+        val profileConfigFile = File(profileDir, ".ankidroidprofile")
+
+        // Check if the file already exists
+        if (!profileConfigFile.exists()) {
+            val profileConfig =
+                JSONObject().apply {
+                    put("display_name", profileName)
+                }
+
+            try {
+                profileConfigFile.writeText(profileConfig.toString(4))
+                Timber.d("Created .ankidroidprofile config for default user in $path")
+            } catch (e: Exception) {
+                Timber.e("exception : ${e.message}")
+            }
+        } else {
+            Timber.d("ankidroidprofile config already exists for default user")
         }
     }
 

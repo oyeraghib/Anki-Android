@@ -58,8 +58,10 @@ class SwitchProfilesSettingsFragment : SettingsFragment() {
 
         // TODO: We trigger this via the dialog to add a profile
         val path = CollectionHelper.getCurrentAnkiDroidDirectory(requireContext())
+        // TODO: using hardcoded value of path for testing purpose
+        val tempPath = "/storage/emulated/0/Android/data/com.ichi2.anki.debug/files/"
         val profileName = "oyeraghib"
-        CollectionHelper.createProfileDirectory(path, profileName)
+        CollectionHelper.createProfileDirectory(tempPath, profileName)
     }
 
     private val menuProvider =
