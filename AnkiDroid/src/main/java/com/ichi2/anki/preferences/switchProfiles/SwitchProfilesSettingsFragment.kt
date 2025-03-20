@@ -22,6 +22,7 @@ import android.view.MenuItem
 import android.view.View
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
+import com.ichi2.anki.CollectionHelper
 import com.ichi2.anki.R
 import com.ichi2.anki.preferences.SettingsFragment
 import com.ichi2.anki.preferences.requirePreference
@@ -54,6 +55,11 @@ class SwitchProfilesSettingsFragment : SettingsFragment() {
 
         requireActivity().addMenuProvider(menuProvider, viewLifecycleOwner, Lifecycle.State.RESUMED)
         Timber.d("Fragment attached to: ${requireActivity()::class.java.simpleName}")
+
+        // TODO: We trigger this via the dialog to add a profile
+        val path = CollectionHelper.getCurrentAnkiDroidDirectory(requireContext())
+        val profileName = "oyeraghib"
+        CollectionHelper.createProfileDirectory(path, profileName)
     }
 
     private val menuProvider =
