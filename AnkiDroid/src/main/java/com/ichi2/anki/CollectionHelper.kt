@@ -159,6 +159,26 @@ object CollectionHelper {
         }
     }
 
+    fun renameProfile(
+        profileDir: String,
+        newProfileName: String,
+    ) {
+        val profileConfigFile = File(profileDir, ".ankidroidprofile")
+
+        if (!profileConfigFile.exists()) {
+            throw FileNotFoundException("Profile config file not found in $profileDir")
+        }
+
+        try {
+            val json = JSONObject(profileConfigFile.readText())
+            json.put("display_name", newProfileName) // Update only display_name
+            profileConfigFile.writeText(json.toString(4))
+            Timber.d("Updated display name to: $newProfileName")
+        } catch (e: Exception) {
+            Timber.e("Failed to update profile display name: ${e.message}")
+        }
+    }
+
     /**
      * Try to access the current AnkiDroid directory
      * @return whether or not dir is accessible
