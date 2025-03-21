@@ -179,6 +179,49 @@ object CollectionHelper {
         }
     }
 
+    fun deleteProfile(
+        profilesRootPath: String,
+        profileToDelete: String,
+    ): Boolean {
+        val profilesRootDir = File(profilesRootPath)
+
+        // Ensure the root directory exists
+        if (!profilesRootDir.exists() || !profilesRootDir.isDirectory) {
+            Timber.e("Profiles root directory not found: $profilesRootPath")
+            return false
+        }
+
+        // Iterate through all profile folders inside /files/
+        profilesRootDir.listFiles()?.forEach { profileDir ->
+            Timber.d("profile directories: $profileDir")
+            if (profileDir.isDirectory) {
+                val profileConfigFile = File(profileDir, ".ankidroidprofile")
+
+                Timber.d("profile config: $profileConfigFile")
+
+                if (profileConfigFile.exists()) {
+                    try {
+                        val json = JSONObject(profileConfigFile.readText())
+                        val displayName = json.optString("display_name", "")
+
+                        Timber.d("json: $json, display name: $displayName")
+
+                        // If the display name matches, delete the folder
+                        if (displayName == profileToDelete) {
+                            Timber.d("Deleting profile: $profileToDelete at ${profileDir.absolutePath}")
+                            return profileDir.deleteRecursively()
+                        }
+                    } catch (e: Exception) {
+                        Timber.e("Error reading .ankidroidprofile: ${e.message}")
+                    }
+                }
+            }
+        }
+
+        Timber.e("Profile not found: $profileToDelete")
+        return false
+    }
+
     /**
      * Try to access the current AnkiDroid directory
      * @return whether or not dir is accessible

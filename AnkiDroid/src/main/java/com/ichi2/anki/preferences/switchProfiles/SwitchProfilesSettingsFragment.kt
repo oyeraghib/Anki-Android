@@ -62,9 +62,13 @@ class SwitchProfilesSettingsFragment : SettingsFragment() {
         val tempPath = "/storage/emulated/0/Android/data/com.ichi2.anki.debug/files/"
         val folderPath = "/storage/emulated/0/Android/data/com.ichi2.anki.debug/files/user2"
         val profileName = "oyeraghib"
-        CollectionHelper.createProfileDirectory(tempPath, profileName)
 
-        CollectionHelper.renameProfile(folderPath, "my new profile")
+        val rootFoldersPath = "/storage/emulated/0/Android/data/com.ichi2.anki.debug/files/"
+//        CollectionHelper.createProfileDirectory(tempPath, profileName)
+
+//        CollectionHelper.renameProfile(folderPath, "oyeraghib")
+
+        CollectionHelper.deleteProfile(rootFoldersPath, "oyeraghib")
     }
 
     private val menuProvider =
