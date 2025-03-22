@@ -99,18 +99,18 @@ object CollectionHelper {
                 throw StorageAccessException("Failed to create .nomedia file", e)
             }
         }
-        insertDefaultProfileConfig(path)
+        insertDefaultProfileConfig(path) // calling the method while initialising the default directory
     }
 
-    fun insertDefaultProfileConfig(basePath: String) {
+    private fun insertDefaultProfileConfig(basePath: String) {
         val profileConfigFile = File(basePath, ".ankidroidprofile")
 
         // Check if the file already exists
         if (!profileConfigFile.exists()) {
             val profileConfig =
                 JSONObject().apply {
-                    put("display_name", "User 1")
-                    put("preferences", "default") // Default settings
+                    put("display_name", "default")
+//                    put("preferences", "default") // Default settings
                 }
 
             try {
