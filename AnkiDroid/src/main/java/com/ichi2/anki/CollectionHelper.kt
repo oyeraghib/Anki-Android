@@ -29,6 +29,7 @@ import com.ichi2.anki.preferences.sharedPrefs
 import com.ichi2.libanki.Collection
 import com.ichi2.libanki.DB
 import com.ichi2.preferences.getOrSetString
+import org.json.JSONObject
 import timber.log.Timber
 import java.io.File
 import java.io.FileNotFoundException
@@ -77,17 +78,31 @@ object CollectionHelper {
      * @param path  Directory to initialize
      * @throws StorageAccessException If no write access to directory
      */
+    private const val PROFILE_CONFIG_FILE = ".ankidroidprofile"
+
     @Synchronized
     @Throws(StorageAccessException::class)
     fun initializeAnkiDroidDirectory(path: String) {
         // Create specified directory if it doesn't exit
+        Timber.d("Path: $path")
         val dir = File(path)
+        val profileConfigFile = File(dir, PROFILE_CONFIG_FILE)
+
         if (!dir.exists() && !dir.mkdirs()) {
             throw StorageAccessException("Failed to create AnkiDroid directory $path")
         }
         if (!dir.canWrite()) {
             throw StorageAccessException("No write access to AnkiDroid directory $path")
         }
+
+        if (!profileConfigFile.exists()) {
+            val defaultProfile =
+                JSONObject().apply {
+                    put("display_name", "default")
+                }
+            profileConfigFile.writeText(defaultProfile.toString(4)) // Pretty print JSON
+        }
+
         // Add a .nomedia file to it if it doesn't exist
         val nomedia = File(dir, ".nomedia")
         if (!nomedia.exists()) {

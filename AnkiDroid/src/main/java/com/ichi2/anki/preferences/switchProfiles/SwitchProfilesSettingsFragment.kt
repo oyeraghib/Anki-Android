@@ -15,6 +15,7 @@
  ****************************************************************************************/
 package com.ichi2.anki.preferences.switchProfiles
 
+import android.content.Context
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
@@ -35,6 +36,8 @@ class SwitchProfilesSettingsFragment : SettingsFragment() {
     override val analyticsScreenNameConstant: String
         get() = "pref.switchProfiles"
 
+    private val profilesSharedPrefs = "profiles_prefs"
+
     override fun initSubscreen() {
         requirePreference<ProfileListPreference>(getString(R.string.pref_switch_profiles_screen_key)).apply {
         }
@@ -50,10 +53,23 @@ class SwitchProfilesSettingsFragment : SettingsFragment() {
         savedInstanceState: Bundle?,
     ) {
         super.onViewCreated(view, savedInstanceState)
-        Timber.d("inside onViewCreated")
 
         requireActivity().addMenuProvider(menuProvider, viewLifecycleOwner, Lifecycle.State.RESUMED)
-        Timber.d("Fragment attached to: ${requireActivity()::class.java.simpleName}")
+
+        val prefs = requireContext().getSharedPreferences(profilesSharedPrefs, Context.MODE_PRIVATE)
+        if (!prefs.contains("AnkiDroid")) {
+            prefs.edit().putString("AnkiDroid", "default").apply() // folder name -> display_name
+        }
+
+        val profiles = getAllProfiles(requireContext())
+        for ((folder, name) in profiles) {
+            Timber.d("folder: $folder, profile: $name")
+        }
+    }
+
+    private fun getAllProfiles(context: Context): Map<String, String> {
+        val prefs = context.getSharedPreferences(profilesSharedPrefs, Context.MODE_PRIVATE)
+        return prefs.all.filterValues { it is String }.mapValues { it.value as String }
     }
 
     private val menuProvider =
