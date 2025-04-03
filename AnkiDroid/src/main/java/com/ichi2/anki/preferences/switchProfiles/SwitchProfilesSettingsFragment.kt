@@ -69,17 +69,73 @@ class SwitchProfilesSettingsFragment : SettingsFragment() {
             Timber.d("folder: $folder, profile: $name")
         }
 
+        val profilesDir = File(CollectionHelper.getCurrentAnkiDroidDirectory(requireContext())).parent
+
         // Creating a new profile
-        val newProfileName = "oyeraghib"
-        createNewProfile(newProfileName)
+        val profileName = "oyeraghib"
+//        createNewProfile(profilesDir, profileName)
+        val newProfileName = "arthur"
+        renameProfile(profileDir = profilesDir!!, "user4", newProfileName)
     }
 
-    private fun createNewProfile(newProfileName: String): Boolean {
-        // gets the directory
-        val dir = CollectionHelper.getCurrentAnkiDroidDirectory(requireContext())
-        val profilesDir = File(dir).parent
-        Timber.d("dir: $dir")
+    private fun renameProfile(
+        profileDir: String,
+        folderName: String,
+        newProfileName: String,
+    ) {
+        Timber.d("$profileDir, $folderName, $newProfileName")
 
+        renameProfileInPrefs(folderName, newProfileName)
+        updateProfileConfigFile(profileDir, newProfileName, folderName)
+    }
+
+    fun renameProfileInPrefs(
+        folderName: String,
+        newProfileName: String,
+    ) {
+        val profilesPrefs = requireContext().getSharedPreferences("profiles_prefs", Context.MODE_PRIVATE)
+
+        // Find the key with the old name and update its value
+        val allEntries = profilesPrefs.all
+        val editor = profilesPrefs.edit()
+
+        allEntries.forEach { (key, value) ->
+            if (key == folderName) {
+                editor.putString(folderName, newProfileName) // Update to new name
+            }
+        }
+
+        editor.apply()
+    }
+
+    private fun updateProfileConfigFile(
+        profileDir: String,
+        newName: String,
+        folderName: String,
+    ) {
+        val dir = File(profileDir, folderName)
+        Timber.d("dir: $dir")
+        val configFile = File(dir, ".ankidroidprofile")
+
+        if (configFile.exists()) {
+            val lines = configFile.readLines().toMutableList()
+            for (i in lines.indices) {
+                if (lines[i].startsWith("display_name=")) {
+                    lines[i] = "display_name=$newName"
+                    break
+                }
+            }
+            configFile.writeText(lines.joinToString("\n"))
+        } else {
+            // If file doesn’t exist, create it with the new name
+            configFile.writeText("display_name=$newName")
+        }
+    }
+
+    private fun createNewProfile(
+        profilesDir: String,
+        newProfileName: String,
+    ): Boolean {
         // generates a unique folder name
         val userFolder = generateUniqueProfileFolder(File(profilesDir!!))
 
