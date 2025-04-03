@@ -70,12 +70,87 @@ class SwitchProfilesSettingsFragment : SettingsFragment() {
         }
 
         val profilesDir = File(CollectionHelper.getCurrentAnkiDroidDirectory(requireContext())).parent
+        val deleteProfileDir = File(CollectionHelper.getCurrentAnkiDroidDirectory(requireContext())).parentFile
 
         // Creating a new profile
         val profileName = "oyeraghib"
-//        createNewProfile(profilesDir, profileName)
+//        createNewProfile(profilesDir!!, profileName)
         val newProfileName = "arthur"
-        renameProfile(profileDir = profilesDir!!, "user4", newProfileName)
+//        renameProfile(profileDir = profilesDir!!, "user4", newProfileName)
+        deleteProfile("user4", deleteProfileDir!!) // this is mock: real value comes from shared preferences selection
+    }
+
+    private fun deleteProfile(
+        folderName: String,
+        profileDir: File,
+    ) {
+        val profilesPrefs = requireContext().getSharedPreferences("profiles_prefs", Context.MODE_PRIVATE)
+        val displayName = profilesPrefs.getString(folderName, null)
+
+        val deleteProfileDir = File(profileDir, folderName)
+
+        Timber.d("display name: $displayName, profile dir: $profileDir, deletePD: $deleteProfileDir")
+
+        if (displayName != null) {
+            deleteProfileFromPrefs(folderName) // Remove from profiles_prefs.xml
+            deleteProfileLocalSharedPreferences(folderName) // Remove per-profile SharedPreferences
+
+            val success = deleteProfileFolder(deleteProfileDir, displayName) // Remove folder if verified
+            if (!success) {
+                Timber.e("ProfileDeletion", "Profile folder deletion failed for: ${profileDir.absolutePath}")
+            }
+        } else {
+            Timber.e("ProfileDeletion", "Profile entry not found for folder: $folderName")
+        }
+    }
+
+    private fun deleteProfileFromPrefs(folderName: String) {
+        val profilesPrefs = requireContext().getSharedPreferences("profiles_prefs", Context.MODE_PRIVATE)
+        val editor = profilesPrefs.edit()
+
+        if (profilesPrefs.contains(folderName)) {
+            editor.remove(folderName) // Remove the profile entry
+            editor.apply()
+            Timber.d("ProfileDeletion", "Deleted profile entry for $folderName from profiles_prefs.xml")
+        }
+    }
+
+    private fun deleteProfileLocalSharedPreferences(folderName: String) {
+        val prefsFile = File(requireContext().filesDir.parent, "shared_prefs/${folderName}_shared_prefs.xml")
+        if (prefsFile.exists()) {
+            prefsFile.delete()
+            Timber.d("ProfileDeletion", "Deleted SharedPreferences file for $folderName")
+        }
+    }
+
+    private fun deleteProfileFolder(
+        profileDir: File,
+        expectedDisplayName: String,
+    ): Boolean {
+        val configFile = File(profileDir, ".ankidroidprofile")
+
+        if (configFile.exists()) {
+            val configLines = configFile.readLines()
+            for (line in configLines) {
+                if (line.startsWith("display_name=")) {
+                    val storedDisplayName = line.substringAfter("display_name=")
+                    if (storedDisplayName == expectedDisplayName) {
+                        return profileDir.deleteRecursively().also {
+                            Timber.d("ProfileDeletion", "Deleted profile folder: ${profileDir.absolutePath}")
+                        }
+                    } else {
+                        Timber.e(
+                            "ProfileDeletion",
+                            "Display name mismatch! Expected '$expectedDisplayName', but found '$storedDisplayName'.",
+                        )
+                        return false
+                    }
+                }
+            }
+        }
+
+        Timber.e("ProfileDeletion", "Failed to delete profile: .ankidroidprofile missing or invalid.")
+        return false
     }
 
     private fun renameProfile(
