@@ -16,6 +16,7 @@
 package com.ichi2.anki.preferences.switchProfiles
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
@@ -23,11 +24,13 @@ import android.view.MenuItem
 import android.view.View
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
+import com.ichi2.anki.CollectionHelper
 import com.ichi2.anki.R
 import com.ichi2.anki.preferences.SettingsFragment
 import com.ichi2.anki.preferences.requirePreference
 import com.ichi2.anki.showThemedToast
 import timber.log.Timber
+import java.io.File
 
 class SwitchProfilesSettingsFragment : SettingsFragment() {
     override val preferenceResource: Int
@@ -65,6 +68,84 @@ class SwitchProfilesSettingsFragment : SettingsFragment() {
         for ((folder, name) in profiles) {
             Timber.d("folder: $folder, profile: $name")
         }
+
+        // Creating a new profile
+        val newProfileName = "oyeraghib"
+        createNewProfile(newProfileName)
+    }
+
+    private fun createNewProfile(newProfileName: String): Boolean {
+        // gets the directory
+        val dir = CollectionHelper.getCurrentAnkiDroidDirectory(requireContext())
+        val profilesDir = File(dir).parent
+        Timber.d("dir: $dir")
+
+        // generates a unique folder name
+        val userFolder = generateUniqueProfileFolder(File(profilesDir!!))
+
+        // creates a new folder
+        val newProfileDir = File(profilesDir, userFolder)
+        if (!newProfileDir.mkdirs()) {
+            Timber.e("ProfileCreation", "Failed to create directory: ${newProfileDir.absolutePath}")
+            return false
+        }
+
+        // Creates a new set of SharedPreferences for this profile
+        val profilePrefs = requireContext().getSharedPreferences("${userFolder}_shared_prefs", Context.MODE_PRIVATE)
+        profilePrefs
+            .edit()
+            .putString("display_name", newProfileName)
+            .apply()
+
+        // add mock ankidroid collection, data and other files
+        collectionPathInValidFolder(newProfileDir.toString())
+
+        // Create .config file and store metadata
+        val configFile = File(newProfileDir, ".ankidroidprofile")
+        configFile.writeText("display_name=$newProfileName")
+
+        // Save to profiles_prefs.xml SharedPreferences
+        saveProfileToPrefs(userFolder, newProfileName)
+
+        Timber.d("ProfileCreation", "Profile $newProfileDir created successfully at ${newProfileDir.absolutePath}")
+        return true
+    }
+
+    fun collectionPathInValidFolder(dir: String): String {
+        CollectionHelper.initializeAnkiDroidDirectory(dir)
+        return File(dir, "collection.anki2").absolutePath
+    }
+
+    // Function to save profile info to SharedPreferences
+    private fun saveProfileToPrefs(
+        profileId: String,
+        displayName: String,
+    ) {
+        val sharedPrefs = getAppSharedPreferences()
+        sharedPrefs.edit().putString(profileId, displayName).apply()
+    }
+
+    // Function to get app-wide SharedPreferences
+    private fun getAppSharedPreferences(): SharedPreferences =
+        requireContext().getSharedPreferences(profilesSharedPrefs, Context.MODE_PRIVATE)
+
+    /**
+     * generates a new folder user{x+1} if a user{x} already exists taking the folder with
+     * highest value of x.
+     * If no folder with user{x} exits creates a folder called as user1
+     */
+    private fun generateUniqueProfileFolder(profilesDir: File): String {
+        val existingProfiles =
+            profilesDir
+                .listFiles { file -> file.isDirectory && file.name.matches(Regex("user\\d+")) }
+                ?.map { it.name.removePrefix("user").toIntOrNull() }
+                ?.filterNotNull()
+                ?.sorted() ?: emptyList()
+
+        Timber.d("existing profile : $existingProfiles")
+
+        val nextIndex = if (existingProfiles.isEmpty()) 1 else existingProfiles.maxOrNull()!! + 1
+        return "user$nextIndex"
     }
 
     private fun getAllProfiles(context: Context): Map<String, String> {
