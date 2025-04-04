@@ -65,19 +65,23 @@ class SwitchProfilesSettingsFragment : SettingsFragment() {
         }
 
         val profiles = getAllProfiles(requireContext())
+        val profile: MutableList<String> = mutableListOf()
         for ((folder, name) in profiles) {
             Timber.d("folder: $folder, profile: $name")
+            profile.add(name)
         }
+
+        Timber.d("Profiles available: $profile")
 
         val profilesDir = File(CollectionHelper.getCurrentAnkiDroidDirectory(requireContext())).parent
         val deleteProfileDir = File(CollectionHelper.getCurrentAnkiDroidDirectory(requireContext())).parentFile
 
         // Creating a new profile
-        val profileName = "oyeraghib"
+        val profileName = "david"
 //        createNewProfile(profilesDir!!, profileName)
-        val newProfileName = "arthur"
-//        renameProfile(profileDir = profilesDir!!, "user4", newProfileName)
-        deleteProfile("user4", deleteProfileDir!!) // this is mock: real value comes from shared preferences selection
+        val newProfileName = "oyeraghib"
+        renameProfile(profileDir = profilesDir!!, "user2", newProfileName)
+//        deleteProfile("user5", deleteProfileDir!!) // this is mock: real value comes from shared preferences selection
     }
 
     private fun deleteProfile(
