@@ -44,13 +44,7 @@ class SwitchProfilesSettingsFragment : SettingsFragment() {
     private val profilesSharedPrefs = "profiles_prefs"
 
     override fun initSubscreen() {
-        requirePreference<ProfileListPreference>(getString(R.string.pref_switch_profiles_screen_key)).apply {
-            val profiles =
-                getAllProfiles(requireContext()).map { (folder, name) ->
-                    Profile(folder, name)
-                }
-            setProfiles(profiles)
-        }
+        updateProfileListUI()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -130,6 +124,7 @@ class SwitchProfilesSettingsFragment : SettingsFragment() {
                         profileId = profileId,
                         profileName = profileName,
                     )
+                    updateProfileListUI()
                 } else {
                     showThemedToast(context, "Profile name cannot be empty", true)
                 }
@@ -182,5 +177,15 @@ class SwitchProfilesSettingsFragment : SettingsFragment() {
     private fun getAllProfiles(context: Context): Map<String, String> {
         val prefs = context.getSharedPreferences(profilesSharedPrefs, Context.MODE_PRIVATE)
         return prefs.all.filterValues { it is String }.mapValues { it.value as String }
+    }
+
+    private fun updateProfileListUI() {
+        requirePreference<ProfileListPreference>(getString(R.string.pref_switch_profiles_screen_key)).apply {
+            val profiles =
+                getAllProfiles(requireContext()).map { (folder, name) ->
+                    Profile(folder, name)
+                }
+            setProfiles(profiles)
+        }
     }
 }
