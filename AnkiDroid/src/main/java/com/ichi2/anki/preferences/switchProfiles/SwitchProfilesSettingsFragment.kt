@@ -15,11 +15,13 @@
  ****************************************************************************************/
 package com.ichi2.anki.preferences.switchProfiles
 
+import android.content.Context
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import androidx.core.content.edit
 import androidx.core.view.MenuProvider
 import androidx.lifecycle.Lifecycle
 import com.ichi2.anki.CollectionHelper
@@ -36,14 +38,34 @@ class SwitchProfilesSettingsFragment : SettingsFragment() {
     override val analyticsScreenNameConstant: String
         get() = "pref.switchProfiles"
 
+    private val profilesSharedPrefs = "profiles_prefs"
+
     override fun initSubscreen() {
         requirePreference<ProfileListPreference>(getString(R.string.pref_switch_profiles_screen_key)).apply {
+            val profiles =
+                getAllProfiles(requireContext()).map { (folder, name) ->
+                    Profile(folder, name)
+                }
+            setProfiles(profiles)
         }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Timber.d("inside onCreate")
+        val prefs = requireContext().getSharedPreferences(profilesSharedPrefs, Context.MODE_PRIVATE)
+        if (!prefs.contains("AnkiDroid")) {
+            prefs.edit { putString("AnkiDroid", "default") } // folder name -> display_name
+        }
+
+        val profiles = getAllProfiles(requireContext())
+        val profile: MutableList<String> = mutableListOf()
+        for ((folder, name) in profiles) {
+            Timber.d("folder: $folder, profile: $name")
+            profile.add(name)
+        }
+
+        Timber.d("Profiles available: $profile")
     }
 
     override fun onViewCreated(
@@ -68,7 +90,7 @@ class SwitchProfilesSettingsFragment : SettingsFragment() {
 
 //        CollectionHelper.renameProfile(folderPath, "oyeraghib")
 
-        CollectionHelper.deleteProfile(rootFoldersPath, "oyeraghib")
+//        CollectionHelper.deleteProfile(rootFoldersPath, "oyeraghib")
     }
 
     private val menuProvider =
@@ -92,4 +114,9 @@ class SwitchProfilesSettingsFragment : SettingsFragment() {
                 }
             }
         }
+
+    private fun getAllProfiles(context: Context): Map<String, String> {
+        val prefs = context.getSharedPreferences(profilesSharedPrefs, Context.MODE_PRIVATE)
+        return prefs.all.filterValues { it is String }.mapValues { it.value as String }
+    }
 }

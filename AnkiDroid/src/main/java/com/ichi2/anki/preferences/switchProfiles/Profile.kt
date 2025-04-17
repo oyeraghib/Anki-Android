@@ -16,6 +16,6 @@
 package com.ichi2.anki.preferences.switchProfiles
 
 data class Profile(
-    val id: Int,
+    val id: String,
     val name: String,
 )

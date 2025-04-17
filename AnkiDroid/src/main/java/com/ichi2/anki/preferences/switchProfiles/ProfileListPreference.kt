@@ -29,7 +29,8 @@ class ProfileListPreference(
     attrs: AttributeSet,
 ) : Preference(context, attrs) {
     private val profileList = mutableListOf<Profile>()
-    private lateinit var adapter: SwitchProfilesAdapter
+    private var adapter: SwitchProfilesAdapter? = null
+    private var pendingProfiles: List<Profile>? = null
 
     init {
         layoutResource = R.layout.switch_profiles_list_item
@@ -42,14 +43,17 @@ class ProfileListPreference(
         recyclerView.layoutManager = LinearLayoutManager(context)
 
         adapter =
-            SwitchProfilesAdapter(context, profileList) { action ->
-            }
+            SwitchProfilesAdapter(context, profileList) { action -> }
         recyclerView.adapter = adapter
 
-        loadProfiles()
+//        loadProfiles()
+        pendingProfiles?.let {
+            setProfiles(it)
+            pendingProfiles = null
+        }
     }
 
-    private fun loadProfiles() {
+    /*private fun loadProfiles() {
         profileList.clear()
         profileList.addAll(
             listOf(
@@ -61,6 +65,17 @@ class ProfileListPreference(
             ),
         )
         adapter.notifyDataSetChanged()
+    }*/
+
+    fun setProfiles(profiles: List<Profile>) {
+        if (adapter == null) {
+            // Save for later when adapter is initialized
+            pendingProfiles = profiles
+            return
+        }
+        profileList.clear()
+        profileList.addAll(profiles)
+        adapter?.notifyDataSetChanged()
     }
 
     private fun renameProfile(profile: Profile) {
