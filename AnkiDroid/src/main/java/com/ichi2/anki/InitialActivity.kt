@@ -77,6 +77,7 @@ object InitialActivity {
         if (!AnkiDroidApp.isSdCardMounted) {
             return StartupFailure.SDCardNotMounted
         } else if (!CollectionHelper.isCurrentAnkiDroidDirAccessible(context)) {
+            Timber.d("not accrssible")
             return StartupFailure.DirectoryNotAccessible
         }
 

@@ -229,9 +229,11 @@ object CollectionHelper {
      */
     fun isCurrentAnkiDroidDirAccessible(context: Context): Boolean =
         try {
+            Timber.d("try accessible")
             initializeAnkiDroidDirectory(getCurrentAnkiDroidDirectory(context))
             true
         } catch (e: StorageAccessException) {
+            Timber.d("falied exception: fadok")
             Timber.w(e)
             false
         }

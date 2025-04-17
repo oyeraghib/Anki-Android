@@ -195,6 +195,7 @@ open class AnkiDroidApp :
 
         // Create the AnkiDroid directory if missing. Send exception report if inaccessible.
         if (Permissions.hasLegacyStorageAccessPermission(this)) {
+            Timber.d("hasLegacyStorageAccessPermission")
             try {
                 val dir = CollectionHelper.getCurrentAnkiDroidDirectory(this)
                 CollectionHelper.initializeAnkiDroidDirectory(dir)
