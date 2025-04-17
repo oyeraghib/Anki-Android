@@ -16,6 +16,7 @@
 package com.ichi2.anki.preferences.switchProfiles
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.text.InputType
 import android.view.View
@@ -28,6 +29,7 @@ import com.ichi2.anki.preferences.SettingsFragment
 import com.ichi2.anki.preferences.requirePreference
 import com.ichi2.anki.showThemedToast
 import timber.log.Timber
+import java.io.File
 
 class SwitchProfilesSettingsFragment : SettingsFragment() {
     override val preferenceResource: Int
@@ -36,6 +38,9 @@ class SwitchProfilesSettingsFragment : SettingsFragment() {
     override val analyticsScreenNameConstant: String
         get() = "pref.switchProfiles"
 
+    /**
+     * Profile level shared preferences to store folder name -> profile name
+     */
     private val profilesSharedPrefs = "profiles_prefs"
 
     override fun initSubscreen() {
@@ -77,27 +82,27 @@ class SwitchProfilesSettingsFragment : SettingsFragment() {
 
         // TODO: We trigger this via the dialog to add a profile
         val path = CollectionHelper.getCurrentAnkiDroidDirectory(requireContext())
+        Timber.d("current path: $path")
         // TODO: using hardcoded value of path for testing purpose
         val tempPath = "/storage/emulated/0/Android/data/com.ichi2.anki.debug/files/"
         val folderPath = "/storage/emulated/0/Android/data/com.ichi2.anki.debug/files/user2"
         val profileName = "oyeraghib"
 
         val rootFoldersPath = "/storage/emulated/0/Android/data/com.ichi2.anki.debug/files/"
-//        CollectionHelper.createProfileDirectory(tempPath, profileName)
 
 //        CollectionHelper.renameProfile(folderPath, "oyeraghib")
 
 //        CollectionHelper.deleteProfile(rootFoldersPath, "oyeraghib")
     }
 
-    fun onAddProfileClicked() {
+    fun onAddProfileClicked(rootFolderPath: String) {
         Timber.d("Add Profile button clicked")
         showThemedToast(requireContext(), "Add Profile clicked", true)
 
-        showAddProfileDialog()
+        showAddProfileDialog(rootFolderPath)
     }
 
-    private fun showAddProfileDialog() {
+    private fun showAddProfileDialog(rootFoldersPath: String) {
         val context = requireContext()
         val editText =
             EditText(context).apply {
@@ -114,6 +119,17 @@ class SwitchProfilesSettingsFragment : SettingsFragment() {
                 val profileName = editText.text.toString().trim()
                 if (profileName.isNotEmpty()) {
                     Timber.d("Adding profile: $profileName")
+
+                    val profileId = generateUniqueProfileFolder(profilesDir = File(rootFoldersPath))
+
+                    // save to global prefs file
+                    saveProfileToPrefs(profileId = profileId, profileName)
+                    // Working on adding a profile
+                    CollectionHelper.createProfileDirectory(
+                        path = rootFoldersPath,
+                        profileId = profileId,
+                        profileName = profileName,
+                    )
                 } else {
                     showThemedToast(context, "Profile name cannot be empty", true)
                 }
@@ -121,6 +137,46 @@ class SwitchProfilesSettingsFragment : SettingsFragment() {
             }.setNegativeButton("Cancel") { dialog, _ ->
                 dialog.dismiss()
             }.show()
+    }
+
+    fun collectionPathInValidFolder(dir: String): String {
+        CollectionHelper.initializeAnkiDroidDirectory(dir)
+        return File(dir, "collection.anki2").absolutePath
+    }
+
+    // Function to save profile info to SharedPreferences
+    private fun saveProfileToPrefs(
+        profileId: String,
+        displayName: String,
+    ) {
+        // TODO: here implement creating a new shared prefs for that profile
+        val prefs = requireContext().getSharedPreferences(profilesSharedPrefs, Context.MODE_PRIVATE)
+        if (!prefs.contains(profileId)) {
+            prefs.edit { putString(profileId, displayName) } // folder name -> display_name
+        }
+    }
+
+    // Function to get app-wide SharedPreferences
+    private fun getAppSharedPreferences(): SharedPreferences =
+        requireContext().getSharedPreferences(profilesSharedPrefs, Context.MODE_PRIVATE)
+
+    /**
+     * generates a new folder user{x+1} if a user{x} already exists taking the folder with
+     * highest value of x.
+     * If no folder with user{x} exits creates a folder called as user1
+     */
+    private fun generateUniqueProfileFolder(profilesDir: File): String {
+        val existingProfiles =
+            profilesDir
+                .listFiles { file -> file.isDirectory && file.name.matches(Regex("user\\d+")) }
+                ?.map { it.name.removePrefix("user").toIntOrNull() }
+                ?.filterNotNull()
+                ?.sorted() ?: emptyList()
+
+        Timber.d("existing profile : $existingProfiles")
+
+        val nextIndex = if (existingProfiles.isEmpty()) 1 else existingProfiles.maxOrNull()!! + 1
+        return "user$nextIndex"
     }
 
     private fun getAllProfiles(context: Context): Map<String, String> {

@@ -150,8 +150,11 @@ class PreferencesFragment :
             view?.findViewById<MaterialToolbar>(R.id.toolbar)?.setOnMenuItemClickListener { item ->
                 when (item.itemId) {
                     R.id.action_add_profile -> {
+                        // TODO: fix hardcoded value
+                        val rootFoldersPath = "/storage/emulated/0/Android/data/com.ichi2.anki.debug/files/"
+
                         // Trigger add profile logic or show dialog
-                        fragment.onAddProfileClicked()
+                        fragment.onAddProfileClicked(rootFolderPath = rootFoldersPath)
                         true
                     }
                     else -> false

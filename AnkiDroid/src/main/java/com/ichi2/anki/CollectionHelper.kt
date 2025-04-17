@@ -130,9 +130,10 @@ object CollectionHelper {
      */
     fun createProfileDirectory(
         path: String,
+        profileId: String,
         profileName: String,
     ) {
-        val profileDir = File(path, "user2") // TODO: use helper method to get this value
+        val profileDir = File(path, profileId)
         Timber.d("profileDir: $profileDir")
 
         if (!profileDir.exists() && !profileDir.mkdirs()) {
