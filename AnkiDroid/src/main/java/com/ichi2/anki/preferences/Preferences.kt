@@ -151,7 +151,7 @@ class PreferencesFragment :
                 when (item.itemId) {
                     R.id.action_add_profile -> {
                         // Trigger add profile logic or show dialog
-//                        (fragment as? SwitchProfilesSettingsFragment)?.onAddProfileClicked()
+                        fragment.onAddProfileClicked()
                         true
                     }
                     else -> false

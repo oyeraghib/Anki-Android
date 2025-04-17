@@ -23,6 +23,7 @@ import com.ichi2.anki.CollectionHelper
 import com.ichi2.anki.R
 import com.ichi2.anki.preferences.SettingsFragment
 import com.ichi2.anki.preferences.requirePreference
+import com.ichi2.anki.showThemedToast
 import timber.log.Timber
 
 class SwitchProfilesSettingsFragment : SettingsFragment() {
@@ -84,6 +85,11 @@ class SwitchProfilesSettingsFragment : SettingsFragment() {
 //        CollectionHelper.renameProfile(folderPath, "oyeraghib")
 
 //        CollectionHelper.deleteProfile(rootFoldersPath, "oyeraghib")
+    }
+
+    fun onAddProfileClicked() {
+        Timber.d("Add Profile button clicked")
+        showThemedToast(requireContext(), "Add Profile clicked", true)
     }
 
     private fun getAllProfiles(context: Context): Map<String, String> {
