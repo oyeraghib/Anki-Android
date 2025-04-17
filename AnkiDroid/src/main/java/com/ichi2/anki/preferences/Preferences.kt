@@ -136,10 +136,28 @@ class PreferencesFragment :
     }
 
     private fun setFragmentTitleOnToolbar(fragment: Fragment) {
+        val toolbar = view?.findViewById<MaterialToolbar>(R.id.toolbar)
+
         val title = if (fragment is TitleProvider) fragment.title else getString(R.string.settings)
 
         view?.findViewById<CollapsingToolbarLayout>(R.id.collapsingToolbarLayout)?.title = title
-        view?.findViewById<MaterialToolbar>(R.id.toolbar)?.title = title
+        toolbar?.title = title
+
+        toolbar?.menu?.clear()
+
+        if (fragment is SwitchProfilesSettingsFragment) {
+            view?.findViewById<MaterialToolbar>(R.id.toolbar)?.inflateMenu(R.menu.switch_profiles_menu)
+            view?.findViewById<MaterialToolbar>(R.id.toolbar)?.setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+                    R.id.action_add_profile -> {
+                        // Trigger add profile logic or show dialog
+//                        (fragment as? SwitchProfilesSettingsFragment)?.onAddProfileClicked()
+                        true
+                    }
+                    else -> false
+                }
+            }
+        }
     }
 
     private fun setOpenTransition(fragmentTransaction: FragmentTransaction) {
