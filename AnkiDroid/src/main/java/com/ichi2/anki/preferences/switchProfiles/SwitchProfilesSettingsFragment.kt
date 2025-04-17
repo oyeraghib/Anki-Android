@@ -17,7 +17,10 @@ package com.ichi2.anki.preferences.switchProfiles
 
 import android.content.Context
 import android.os.Bundle
+import android.text.InputType
 import android.view.View
+import android.widget.EditText
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.edit
 import com.ichi2.anki.CollectionHelper
 import com.ichi2.anki.R
@@ -90,6 +93,34 @@ class SwitchProfilesSettingsFragment : SettingsFragment() {
     fun onAddProfileClicked() {
         Timber.d("Add Profile button clicked")
         showThemedToast(requireContext(), "Add Profile clicked", true)
+
+        showAddProfileDialog()
+    }
+
+    private fun showAddProfileDialog() {
+        val context = requireContext()
+        val editText =
+            EditText(context).apply {
+                hint = "Enter profile name"
+                inputType = InputType.TYPE_CLASS_TEXT
+                setPadding(32, 32, 32, 32)
+            }
+
+        AlertDialog
+            .Builder(context)
+            .setTitle("Add a New Profile")
+            .setView(editText)
+            .setPositiveButton("Add") { dialog, _ ->
+                val profileName = editText.text.toString().trim()
+                if (profileName.isNotEmpty()) {
+                    Timber.d("Adding profile: $profileName")
+                } else {
+                    showThemedToast(context, "Profile name cannot be empty", true)
+                }
+                dialog.dismiss()
+            }.setNegativeButton("Cancel") { dialog, _ ->
+                dialog.dismiss()
+            }.show()
     }
 
     private fun getAllProfiles(context: Context): Map<String, String> {
