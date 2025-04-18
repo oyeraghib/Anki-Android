@@ -211,7 +211,7 @@ class SwitchProfilesSettingsFragment : SettingsFragment() {
                         putString(profile.id, newName)
                     }
 
-                    showThemedToast(requireContext(), "Profile renamed to ${profile.name}", true)
+                    showThemedToast(requireContext(), "Profile renamed to $newName", true)
 
                     // Update UI
                     updateProfileListUI()
