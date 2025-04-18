@@ -54,6 +54,9 @@ class ProfileListPreference(
 
 //                    renameProfile(rename)
                 },
+                onProfileDeleteClicked = { profile ->
+                    profileListCallback?.onDeleteProfile(profile)
+                },
             )
 
         recyclerView.adapter = adapter

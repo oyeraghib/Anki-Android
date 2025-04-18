@@ -30,6 +30,7 @@ class SwitchProfilesAdapter(
     private val profiles: List<Profile>,
     private val onActionClick: (Profile) -> Unit,
     private val onProfileRenameClicked: (Profile) -> Unit,
+    private val onProfileDeleteClicked: (Profile) -> Unit,
 ) : RecyclerView.Adapter<SwitchProfilesAdapter.ProfileViewHolder>() {
     private var selectedPos = 0
 
@@ -51,6 +52,7 @@ class SwitchProfilesAdapter(
             context = context,
             onActionClick = onActionClick,
             onProfileRenameClicked = onProfileRenameClicked,
+            onProfileDeleteClicked = onProfileDeleteClicked,
         )
 
         // update selection state
@@ -77,6 +79,7 @@ class SwitchProfilesAdapter(
             profile: Profile,
             onActionClick: (Profile) -> Unit,
             onProfileRenameClicked: (Profile) -> Unit,
+            onProfileDeleteClicked: (Profile) -> Unit,
             context: Context,
         ) {
             profileAvatar.text = getInitials(profile.name)
@@ -87,7 +90,7 @@ class SwitchProfilesAdapter(
             }
 
             profileDelete.setOnClickListener {
-                showThemedToast(context, "Profile delete: ${profile.name}", true)
+                onProfileDeleteClicked(profile)
             }
         }
 

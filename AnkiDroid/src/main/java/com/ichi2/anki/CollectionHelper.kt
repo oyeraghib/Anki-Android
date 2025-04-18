@@ -184,45 +184,23 @@ object CollectionHelper {
 
     fun deleteProfile(
         profilesRootPath: String,
-        profileToDelete: String,
+        profileId: String,
     ): Boolean {
-        val profilesRootDir = File(profilesRootPath)
+        val profileFolder = File(profilesRootPath, profileId)
 
-        // Ensure the root directory exists
-        if (!profilesRootDir.exists() || !profilesRootDir.isDirectory) {
-            Timber.e("Profiles root directory not found: $profilesRootPath")
+        // Check if the folder exists
+        if (!profileFolder.exists() || !profileFolder.isDirectory) {
+            Timber.e("Profile folder not found: $profileFolder")
             return false
         }
 
-        // Iterate through all profile folders inside /files/
-        profilesRootDir.listFiles()?.forEach { profileDir ->
-            Timber.d("profile directories: $profileDir")
-            if (profileDir.isDirectory) {
-                val profileConfigFile = File(profileDir, ".ankidroidprofile")
-
-                Timber.d("profile config: $profileConfigFile")
-
-                if (profileConfigFile.exists()) {
-                    try {
-                        val json = JSONObject(profileConfigFile.readText())
-                        val displayName = json.optString("display_name", "")
-
-                        Timber.d("json: $json, display name: $displayName")
-
-                        // If the display name matches, delete the folder
-                        if (displayName == profileToDelete) {
-                            Timber.d("Deleting profile: $profileToDelete at ${profileDir.absolutePath}")
-                            return profileDir.deleteRecursively()
-                        }
-                    } catch (e: Exception) {
-                        Timber.e("Error reading .ankidroidprofile: ${e.message}")
-                    }
-                }
-            }
+        // Delete profile folder
+        val deleted = profileFolder.deleteRecursively()
+        if (!deleted) {
+            Timber.e("Failed to delete folder: $profileFolder")
+            return false
         }
-
-        Timber.e("Profile not found: $profileToDelete")
-        return false
+        return true
     }
 
     /**

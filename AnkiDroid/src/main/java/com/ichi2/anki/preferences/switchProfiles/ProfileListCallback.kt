@@ -19,4 +19,6 @@ interface ProfileListCallback {
     fun onRenameProfile(profile: Profile)
 
     fun onUpdateProfileList()
+
+    fun onDeleteProfile(profile: Profile)
 }

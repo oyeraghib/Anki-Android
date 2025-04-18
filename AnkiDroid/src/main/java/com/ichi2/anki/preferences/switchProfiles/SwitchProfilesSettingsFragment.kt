@@ -241,7 +241,42 @@ class SwitchProfilesSettingsFragment : SettingsFragment() {
                     override fun onUpdateProfileList() {
                         updateProfileListUI()
                     }
+
+                    override fun onDeleteProfile(profile: Profile) {
+                        showDeleteProfileDialog(profile)
+                    }
                 }
         }
+    }
+
+    fun showDeleteProfileDialog(profile: Profile) {
+        AlertDialog
+            .Builder(requireContext())
+            .setTitle("Delete Profile")
+            .setMessage("Are you sure you want to delete the profile \"${profile.name}\"? This action cannot be undone.")
+            .setPositiveButton("Yes") { dialog, _ ->
+                // TODO: dont use root path
+                val rootFoldersPath = "/storage/emulated/0/Android/data/com.ichi2.anki.debug/files/"
+
+                CollectionHelper.deleteProfile(
+                    rootFoldersPath,
+                    profileId = profile.id,
+                )
+
+                // Update SharedPreferences
+                val prefs = requireContext().getSharedPreferences("profiles_prefs", Context.MODE_PRIVATE)
+                prefs.edit {
+                    remove(profile.id).apply()
+                }
+
+                showThemedToast(requireContext(), "Profile ${profile.name} deleted", true)
+
+                // Update UI
+                updateProfileListUI()
+                dialog.dismiss()
+            }.setNegativeButton("No") { dialog, _ ->
+                dialog.dismiss()
+            }.create()
+            .show()
     }
 }
