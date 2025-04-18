@@ -163,7 +163,9 @@ object CollectionHelper {
     fun renameProfile(
         profileDir: String,
         newProfileName: String,
+        oldProfileId: String,
     ) {
+        val profileDir = File(profileDir, oldProfileId)
         val profileConfigFile = File(profileDir, ".ankidroidprofile")
 
         if (!profileConfigFile.exists()) {

@@ -29,6 +29,7 @@ class SwitchProfilesAdapter(
     private val context: Context,
     private val profiles: List<Profile>,
     private val onActionClick: (Profile) -> Unit,
+    private val onProfileRenameClicked: (Profile) -> Unit,
 ) : RecyclerView.Adapter<SwitchProfilesAdapter.ProfileViewHolder>() {
     private var selectedPos = 0
 
@@ -45,7 +46,12 @@ class SwitchProfilesAdapter(
         position: Int,
     ) {
         val profile = profiles[position]
-        holder.bind(profile = profile, context = context, onActionClick = onActionClick)
+        holder.bind(
+            profile = profile,
+            context = context,
+            onActionClick = onActionClick,
+            onProfileRenameClicked = onProfileRenameClicked,
+        )
 
         // update selection state
         holder.itemView.isSelected = (position == selectedPos)
@@ -70,13 +76,14 @@ class SwitchProfilesAdapter(
         fun bind(
             profile: Profile,
             onActionClick: (Profile) -> Unit,
+            onProfileRenameClicked: (Profile) -> Unit,
             context: Context,
         ) {
             profileAvatar.text = getInitials(profile.name)
             profileName.text = profile.name
 
             profileRename.setOnClickListener {
-                showThemedToast(context, "Profile rename: $profile", true)
+                onProfileRenameClicked(profile)
             }
 
             profileDelete.setOnClickListener {

@@ -179,6 +179,51 @@ class SwitchProfilesSettingsFragment : SettingsFragment() {
         return prefs.all.filterValues { it is String }.mapValues { it.value as String }
     }
 
+    private fun showRenameProfileDialog(profile: Profile) {
+        val editText =
+            EditText(context).apply {
+                hint = "Enter new name"
+                setText(profile.name)
+                setPadding(32, 32, 32, 32)
+            }
+
+        AlertDialog
+            .Builder(requireContext())
+            .setTitle("Rename Profile")
+            .setView(editText)
+            .setPositiveButton("Rename") { dialog, _ ->
+                val newName = editText.text.toString().trim()
+                if (newName.isNotEmpty()) {
+                    Timber.d("Renaming profile from ${profile.name} to $newName")
+
+                    // TODO: dont use root path
+                    val rootFoldersPath = "/storage/emulated/0/Android/data/com.ichi2.anki.debug/files/"
+
+                    CollectionHelper.renameProfile(
+                        rootFoldersPath,
+                        newName,
+                        oldProfileId = profile.id,
+                    )
+
+                    // Update SharedPreferences
+                    val prefs = requireContext().getSharedPreferences("profiles_prefs", Context.MODE_PRIVATE)
+                    prefs.edit {
+                        putString(profile.id, newName)
+                    }
+
+                    showThemedToast(requireContext(), "Profile renamed to ${profile.name}", true)
+
+                    // Update UI
+                    updateProfileListUI()
+                } else {
+                    showThemedToast(requireContext(), "Profile name cannot be empty", true)
+                }
+                dialog.dismiss()
+            }.setNegativeButton("Cancel") { dialog, _ ->
+                dialog.dismiss()
+            }.show()
+    }
+
     private fun updateProfileListUI() {
         requirePreference<ProfileListPreference>(getString(R.string.pref_switch_profiles_screen_key)).apply {
             val profiles =
@@ -186,6 +231,17 @@ class SwitchProfilesSettingsFragment : SettingsFragment() {
                     Profile(folder, name)
                 }
             setProfiles(profiles)
+
+            profileListCallback =
+                object : ProfileListCallback {
+                    override fun onRenameProfile(profile: Profile) {
+                        showRenameProfileDialog(profile)
+                    }
+
+                    override fun onUpdateProfileList() {
+                        updateProfileListUI()
+                    }
+                }
         }
     }
 }

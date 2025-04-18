@@ -32,6 +32,8 @@ class ProfileListPreference(
     private var adapter: SwitchProfilesAdapter? = null
     private var pendingProfiles: List<Profile>? = null
 
+    var profileListCallback: ProfileListCallback? = null
+
     init {
         layoutResource = R.layout.switch_profiles_list_item
     }
@@ -43,7 +45,17 @@ class ProfileListPreference(
         recyclerView.layoutManager = LinearLayoutManager(context)
 
         adapter =
-            SwitchProfilesAdapter(context, profileList) { action -> }
+            SwitchProfilesAdapter(
+                context,
+                profileList,
+                onActionClick = { action -> },
+                onProfileRenameClicked = { rename ->
+                    profileListCallback?.onRenameProfile(profile = rename)
+
+//                    renameProfile(rename)
+                },
+            )
+
         recyclerView.adapter = adapter
 
 //        loadProfiles()
@@ -52,20 +64,6 @@ class ProfileListPreference(
             pendingProfiles = null
         }
     }
-
-    /*private fun loadProfiles() {
-        profileList.clear()
-        profileList.addAll(
-            listOf(
-                Profile(1, "David"),
-                Profile(2, "oyeraghib"),
-                Profile(3, "Ashish"),
-                Profile(4, "Mike"),
-                Profile(5, "Arthur"),
-            ),
-        )
-        adapter.notifyDataSetChanged()
-    }*/
 
     fun setProfiles(profiles: List<Profile>) {
         if (adapter == null) {
@@ -76,11 +74,6 @@ class ProfileListPreference(
         profileList.clear()
         profileList.addAll(profiles)
         adapter?.notifyDataSetChanged()
-    }
-
-    private fun renameProfile(profile: Profile) {
-        // Implement rename functionality
-        showThemedToast(context, "Rename: $profile", true)
     }
 
     private fun deleteProfile(profile: Profile) {
